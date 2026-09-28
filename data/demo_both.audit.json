@@ -1,0 +1,73 @@
+{
+  "strategy": "both",
+  "task_coverage": [
+    {
+      "task": "biochemical:inhibition",
+      "split": "train",
+      "positive": 16,
+      "negative": 16,
+      "both_classes": true
+    },
+    {
+      "task": "biochemical:inhibition",
+      "split": "val",
+      "positive": 1,
+      "negative": 1,
+      "both_classes": true
+    },
+    {
+      "task": "biochemical:inhibition",
+      "split": "test",
+      "positive": 1,
+      "negative": 1,
+      "both_classes": true
+    },
+    {
+      "task": "xray:hit",
+      "split": "train",
+      "positive": 16,
+      "negative": 16,
+      "both_classes": true
+    },
+    {
+      "task": "xray:hit",
+      "split": "val",
+      "positive": 1,
+      "negative": 1,
+      "both_classes": true
+    },
+    {
+      "task": "xray:hit",
+      "split": "test",
+      "positive": 1,
+      "negative": 1,
+      "both_classes": true
+    }
+  ],
+  "splits": {
+    "train": {
+      "observations": 67,
+      "trainable": 64,
+      "targets": 4,
+      "chemistry_groups": 4
+    },
+    "val": {
+      "observations": 4,
+      "trainable": 4,
+      "targets": 1,
+      "chemistry_groups": 1
+    },
+    "test": {
+      "observations": 4,
+      "trainable": 4,
+      "targets": 1,
+      "chemistry_groups": 1
+    },
+    "excluded": {
+      "observations": 72,
+      "trainable": 0,
+      "targets": 6,
+      "chemistry_groups": 6
+    }
+  }
+}

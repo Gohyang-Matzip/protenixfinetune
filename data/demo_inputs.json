@@ -1,0 +1,1260 @@
+[
+  {
+    "name": "A_xray_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_xray_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_biochemical_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_xray_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "B_biochemical_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_xray_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "C_biochemical_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_xray_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_01",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_02",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_05",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_06",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCN",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_09",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "c1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_10",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "Cc1ccccc1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_11",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "D_biochemical_12",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCC(=O)O",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "E_xray_03",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYF",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CO",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "E_xray_04",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYF",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCO",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "E_biochemical_03",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYF",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CO",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "E_biochemical_04",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYF",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CCO",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "F_xray_07",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYG",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "C1CC1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "F_xray_08",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYG",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "C1CCC1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "F_biochemical_07",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYG",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "C1CC1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "F_biochemical_08",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYG",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "C1CCC1",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_failed",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "A_uncertain",
+    "sequences": [
+      {
+        "proteinChain": {
+          "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+          "count": 1
+        }
+      },
+      {
+        "ligand": {
+          "ligand": "CC",
+          "count": 1
+        }
+      }
+    ]
+  }
+]

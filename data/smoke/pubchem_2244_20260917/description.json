@@ -1,0 +1,532 @@
+{
+  "PC_AssayContainer": [
+    {
+      "assay": {
+        "descr": {
+          "aid": {
+            "id": 2244,
+            "version": 1
+          },
+          "aid_source": {
+            "db": {
+              "name": "Southern Research Specialized Biocontainment Screening Center",
+              "source_id": {
+                "str": "WNV SAR1 Tox"
+              }
+            }
+          },
+          "name": "A Cell Based Secondary Assay To Explore Cytotoxicity of West Nile Virus Anti-Viral Synthesized/Analog Compounds",
+          "description": [
+            "Southern Research's Specialized Biocontainment Screening Center (SRSBSC)",
+            "Southern Research Institute (Birmingham, Alabama)",
+            "NIH Molecular Libraries Probe Production Centers Network (MLPCN)",
+            "Assay Provider: Dr. Marintha Heil, Southern Research Institute",
+            "Award: 1R03 MH084847-01",
+            "",
+            "This functional assay was developed for detection of compounds inhibiting Vero E6 cells viability as a secondary screen to the West Nile Virus anti-viral assay. In addition to profiling potential lead compounds for cytotoxicity, this project is aiming to find probe specific to the virus and further cytotoxicity can mask anti-viral efficacy of test compound, therefore it is important that cytotoxicity be explored at an early stage of an anti-viral project.  Vero E6 cell line is one of the most prevalently used cell lines for antiviral screening such as West Nile virus screening (AID:  1621).  ",
+            "",
+            "In the present assay, we treated Vero E6 cells with 65 compounds, analogs synthesized based on selected as \"hits\" in the West Nile Virus anti-viral assay, for 72 hours over a 10 point 2-fold dilution series, ranging from 0.078 uM to 80 uM. Following 72 hours of treatment, relative viable cell number was determined using a commercially available assay (Cell Titer Glo, Promega). Each plate contained 64 replicates of vehicle treated cells which served as negative controls."
+          ],
+          "protocol": [
+            "Cell Culture: Vero E6 cells were subcultured every 7 days in E-MEM with 10% fetal bovine serum and 2 mM glutamine (complete growth medium), incubated at 37 degrees C in 5% carbon dioxide, and maintained for no more than 20 passages after ATCC receiving (in between passage 33 ~ 55).",
+            "",
+            "Cell Plating: Fifteen uL of complete growth medium containing 3000 cells were dispensed per well, while stirring. Plates were incubated at 37 C for 24h prior to compound addition.",
+            "",
+            "Compound Dosing/Plating: Carrier control / compounds were diluted in complete growth medium to prepare a 6X concentrated dosing solution which was dispensed into 384-well black clear-bottom tissue culture treated plates (5 uL volume). These plates were incubated briefly while awaiting mock virus addition.  ",
+            "",
+            "Mock virus addition:  At the time of virus addition to the anti-viral plates, 10uL of complete media was added to the cytotoxicity plates.  These plates were returned to the incubator at 37 C, 5% CO2 for 96h.  ",
+            "",
+            "Endpoint/Detection: At the end of the treatment period, assay plates were removed from the incubator and equilibrated to room temperature 10 min. Thirty uL of Cell Titer Glo reagent was added and plates were incubated for an additional 10 min in the dark. At the end of the incubation, assay plates were analyzed using a PerkinElmer Envision microplate reader with an integration time of 0.1 s in luminescence mode.",
+            "",
+            "Data Analysis: Sixty-four control wells containing cells treated with DMSO vehicle and were included on each assay plate.  Because controls matched those of the antiviral plates, no cytotoxicity control was added to the assay plates, thus no Z' calculations were performed.   Compound data was normalized and reported as % viability which was calculated using the following formula: % viability = 100*(Cmpd Lum-Med Ctrl Drug)/(Med Cell Ctrl - Med Ctrl Drug). The normalized % viability was plotted against the tested compound concentrations. The CC50 values were calculated using XLfit formula 205, a 4 parameter Levenburg-Marquardt algorithm with maximum and minimum limits set at 100 and 0, respectively and allowing extrapolation to identify weakly active compounds."
+          ],
+          "comment": [
+            "Compounds that showed <70% cell viability for at least one concentration were defined as \"Active\". If the % viability at all doses was >70%, the compound was defined as \"Inactive\". ",
+            "",
+            "Scoring: SRBCSC uses a three-tier scoring system where scores of 0-40 apply to primary screen data, 41-80 indicates confirmatory screen data, and 81-100 is reserved for confirmatory data on resynthesized compounds. Inactive compounds at any screening level receive a score of 0. In this confirmatory screen, \"Active\" compounds were scored based on CC50 results on a tier of 81-100 with compounds failing confirmation scoring 0."
+          ],
+          "xref": [
+            {
+              "xref": {
+                "aid": 1621
+              }
+            },
+            {
+              "xref": {
+                "aid": 1635
+              }
+            },
+            {
+              "xref": {
+                "aid": 1650
+              }
+            },
+            {
+              "xref": {
+                "aid": 2024
+              }
+            },
+            {
+              "xref": {
+                "aid": 2065
+              }
+            },
+            {
+              "xref": {
+                "aid": 2238
+              }
+            },
+            {
+              "xref": {
+                "aid": 2419
+              }
+            },
+            {
+              "xref": {
+                "aid": 2402
+              }
+            },
+            {
+              "xref": {
+                "aid": 2405
+              }
+            },
+            {
+              "xref": {
+                "aid": 2409
+              }
+            },
+            {
+              "xref": {
+                "aid": 2414
+              }
+            },
+            {
+              "xref": {
+                "taxonomy": 9534
+              }
+            }
+          ],
+          "results": [
+            {
+              "tid": 1,
+              "name": "CC50 Modifier",
+              "type": 4
+            },
+            {
+              "tid": 2,
+              "name": "CC50",
+              "type": 1,
+              "unit": 5,
+              "ac": true
+            },
+            {
+              "tid": 3,
+              "name": "CC50 Std Dev Modifier",
+              "type": 4
+            },
+            {
+              "tid": 4,
+              "name": "CC50 Std Dev",
+              "type": 1,
+              "unit": 254
+            },
+            {
+              "tid": 5,
+              "name": "CC50 Hill Slope",
+              "type": 1,
+              "unit": 254
+            },
+            {
+              "tid": 6,
+              "name": "CC50 Normalized Chi2",
+              "type": 1,
+              "unit": 254
+            },
+            {
+              "tid": 7,
+              "name": "% Cell Viability @ 80 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 80,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 8,
+              "name": "% Cell Viability @ 40 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 40,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 9,
+              "name": "% Cell Viability @ 20 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 20,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 10,
+              "name": "% Cell Viability @ 10 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 10,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 11,
+              "name": "% Cell Viability @ 5 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 5,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 12,
+              "name": "% Cell Viability @ 2.5 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 2.5,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 13,
+              "name": "% Cell Viability @ 1.25 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 1.25,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 14,
+              "name": "% Cell Viability @ 0.625 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.625,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 15,
+              "name": "% Cell Viability @ 0.313 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.312999993562698,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 16,
+              "name": "% Cell Viability @ 0.156 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.156000003218651,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 17,
+              "name": "% Cell Viability @ 0.078 uM (Replicate 1)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.0780000016093254,
+                "unit": 5,
+                "dr_id": 1
+              }
+            },
+            {
+              "tid": 18,
+              "name": "% Cell Viability @ 80 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 80,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 19,
+              "name": "% Cell Viability @ 40 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 40,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 20,
+              "name": "% Cell Viability @ 20 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 20,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 21,
+              "name": "% Cell Viability @ 10 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 10,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 22,
+              "name": "% Cell Viability @ 5 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 5,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 23,
+              "name": "% Cell Viability @ 2.5 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 2.5,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 24,
+              "name": "% Cell Viability @ 1.25 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 1.25,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 25,
+              "name": "% Cell Viability @ 0.625 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.625,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 26,
+              "name": "% Cell Viability @ 0.313 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.312999993562698,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 27,
+              "name": "% Cell Viability @ 0.156 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.156000003218651,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 28,
+              "name": "% Cell Viability @ 0.078 uM (Replicate 2)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.0780000016093254,
+                "unit": 5,
+                "dr_id": 2
+              }
+            },
+            {
+              "tid": 29,
+              "name": "% Cell Viability @ 80 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 80,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 30,
+              "name": "% Cell Viability @ 40 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 40,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 31,
+              "name": "% Cell Viability @ 20 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 20,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 32,
+              "name": "% Cell Viability @ 10 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 10,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 33,
+              "name": "% Cell Viability @ 5 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 5,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 34,
+              "name": "% Cell Viability @ 1.25 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 1.25,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 35,
+              "name": "% Cell Viability @ 0.313 uM (Replicate 3)",
+              "type": 1,
+              "unit": 15,
+              "tc": {
+                "concentration": 0.312999993562698,
+                "unit": 5,
+                "dr_id": 3
+              }
+            },
+            {
+              "tid": 36,
+              "name": "Max % Viability",
+              "description": [
+                "Maximum % Viability observed across all concentrations."
+              ],
+              "type": 1,
+              "unit": 15
+            },
+            {
+              "tid": 37,
+              "name": "Max Viability Conc",
+              "description": [
+                "Concentration at which Maximum % Viability was observed."
+              ],
+              "type": 1,
+              "unit": 5
+            },
+            {
+              "tid": 38,
+              "name": "Min % Viability",
+              "description": [
+                "Minimum % Viability observed across all concentrations."
+              ],
+              "type": 1,
+              "unit": 15
+            },
+            {
+              "tid": 39,
+              "name": "Min Viability Conc",
+              "description": [
+                "Concentration at which Minimum % Viability was observed."
+              ],
+              "type": 1,
+              "unit": 5
+            }
+          ],
+          "revision": 2,
+          "activity_outcome_method": 2,
+          "dr": [
+            {
+              "id": 1,
+              "descr": "CR Plot Labels 1",
+              "dn": "Concentration",
+              "rn": "Response"
+            },
+            {
+              "id": 2,
+              "descr": "CR Plot Labels 2",
+              "dn": "Concentration",
+              "rn": "Response"
+            },
+            {
+              "id": 3,
+              "descr": "CR Plot Labels 3",
+              "dn": "Concentration",
+              "rn": "Response"
+            }
+          ],
+          "grant_number": [
+            "1R03 MH084847-01"
+          ],
+          "project_category": 2
+        }
+      }
+    }
+  ]
+}
