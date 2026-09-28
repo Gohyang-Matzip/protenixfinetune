@@ -1,5 +1,7 @@
 # Screening data → Protenix fine-tuning
 
+GitHub: https://github.com/Gohyang-Matzip/protenixfinetune
+
 공개 fragment screening·drug repurposing 결과와 자체 실험을 함께 사용하는 **범용 다중 표적 학습 프로그램**입니다. 양성 구조와 실험 양성·음성을 구분해 학습하고, 공개 데이터 사전학습에서 개인 데이터 fine-tuning으로 이어갈 수 있습니다.
 
 **Protenix를 설치하지 않습니다.** 데이터 수집·검증·분할은 Python 3.11+ 표준 라이브러리로 실행됩니다. 학습은 기존 PyTorch/Protenix 환경을 연결합니다. 공개 데이터 다운로드는 명시적인 `fetch` 명령에서만 수행합니다.
