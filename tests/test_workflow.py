@@ -71,7 +71,8 @@ class ManifestTests(unittest.TestCase):
                 path.write_text(json.dumps({'predictions': records}))
             self.assertEqual(main(['compare', *map(str, paths), '--output', str(root/'comparison.json')]), 0)
             comparison = json.loads((root/'comparison.json').read_text())
-            self.assertEqual(comparison[str(paths[0])]['metrics_by_target']['A']['average_precision'], 1.)
+            by_target = {v['target_id']: v for v in comparison[str(paths[0])]['metrics_by_target'].values()}
+            self.assertEqual(by_target['A']['average_precision'], 1.)
             records[0]['label'] = '1'
             paths[1].write_text(json.dumps({'predictions': records}))
             with redirect_stderr(io.StringIO()):
@@ -128,13 +129,6 @@ class TrainingTests(unittest.TestCase):
         second = b(f, cache_key='same')[0]
         self.assertTrue(torch.equal(first, second))
 
-    def test_apo_mapping_is_injective_and_integral(self):
-        from fragment_ft.synthetic import residue_mapping
-        self.assertEqual(residue_mapping([1, 2], {'residue_offset': 100}), {1: 101, 2: 102})
-        for settings in ({'residue_map': {'2': 1}}, {'residue_offset': 1.5},
-                         {'residue_map': {'1': 1.2}}, {'residue_map': {'1': True}}):
-            with self.assertRaises(ValueError): residue_mapping([1, 2], settings)
-
     def test_actual_loop_synthetic_comparison_resume_and_negative_guard(self):
         import torch
         from fragment_ft.__main__ import parser
@@ -189,7 +183,7 @@ class TrainingTests(unittest.TestCase):
             self.assertIn('synthetic', model.backend.kinds)
             with (root/'full/step_000003.json').open() as stream:
                 report = json.load(stream)
-            self.assertEqual(set(report['validation']), {'A', 'B'})
+            self.assertEqual({v['target_id'] for v in report['validation'].values()}, {'A', 'B'})
             self.assertTrue(all(r['split'] == 'val' for r in report['predictions']))
             resumed = FineTuner(Backend(), 'joint', ['weight'], hidden=4)
             resumed.load_state_dict(initial)

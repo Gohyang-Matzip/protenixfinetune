@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64"]  # 64+: PEP 660 editable installs
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fragment-ft"
+dynamic = ["version"]
+description = "Screening observations to Protenix fine-tuning; connects an existing Protenix, never installs it"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+# RDKit: InChIKey molecule identity in audit and prepare.
+dependencies = ["rdkit"]
+
+[project.optional-dependencies]
+train = ["torch", "numpy"]
+
+[project.scripts]
+fragment-ft = "fragment_ft.__main__:main"
+
+[tool.setuptools]
+packages = ["fragment_ft"]
+
+[tool.setuptools.dynamic]
+version = {attr = "fragment_ft.__version__"}

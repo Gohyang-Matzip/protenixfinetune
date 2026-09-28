@@ -72,7 +72,6 @@ class GeneralDataTests(unittest.TestCase):
 
     def test_quality_and_phenotype_are_not_binding_negatives(self):
         row = observations()[0]
-        self.assertTrue(hasattr(data, 'trainable'), 'Observation eligibility policy is missing')
         self.assertTrue(data.trainable(row))
         self.assertFalse(data.trainable(dict(row, quality='fail')))
         self.assertFalse(data.trainable(dict(row, assay_type='phenotypic', endpoint='viability')))
@@ -80,7 +79,6 @@ class GeneralDataTests(unittest.TestCase):
         self.assertNotEqual(data.task_name(row), data.task_name(dict(row, assay_type='biochemical', endpoint='inhibition')))
 
     def test_cold_splits_and_double_cold_exclusions(self):
-        self.assertTrue(hasattr(data, 'split_audit'), 'Cold split auditing is missing')
         rows = observations()
         for strategy in ('chemistry', 'target', 'both'):
             result = data.assign_splits(rows, seed=4, validation=.25, test=.25, strategy=strategy)
@@ -104,7 +102,6 @@ class GeneralDataTests(unittest.TestCase):
         self.assertEqual(len(report), 2, 'Different experimental endpoints must not share metrics')
 
     def test_import_maps_observed_outcomes_and_preserves_raw_rows(self):
-        self.assertIsNotNone(importlib.util.find_spec('fragment_ft.sources'), 'Public-data importer is missing')
         from fragment_ft.sources import import_csv
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -153,7 +150,10 @@ class MultiTaskTests(unittest.TestCase):
         # No packets exist for these rows: any accidental training/evaluation inclusion fails.
         rows += [dict(rows[0], sample_id='bad', quality='fail'),
                  dict(rows[0], sample_id='phenotype', assay_id='cell', assay_type='phenotypic', endpoint='viability'),
-                 dict(observations()[10], sample_id='held_out', split='test')]
+                 dict(observations()[10], sample_id='held_out', split='test'),
+                 # Validation runs on every val row it keeps, so these fail deterministically if included.
+                 dict(rows[2], sample_id='bad_val', quality='fail'),
+                 dict(rows[3], sample_id='uncertain_val', label='uncertain')]
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             features = {'x': torch.eye(3, 2), 'atom_to_token_idx': torch.arange(3),
@@ -193,11 +193,8 @@ class MultiTaskTests(unittest.TestCase):
                         'Previously trained frozen backbone deltas must not disappear')
 
     def test_only_requested_output_receives_supervision_and_transfer_preserves_tasks(self):
-        import inspect
         import torch
-        from fragment_ft.training import FineTuner, checkpoint_payload, training_loss
-        self.assertIn('task_names', inspect.signature(FineTuner).parameters, 'Task-specific outputs are missing')
-        from fragment_ft.training import initialize_delta
+        from fragment_ft.training import FineTuner, checkpoint_payload, initialize_delta, training_loss
         class Backend(torch.nn.Module):
             c_s = c_z = 2
             def __init__(self):

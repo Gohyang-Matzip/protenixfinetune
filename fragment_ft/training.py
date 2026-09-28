@@ -1,6 +1,6 @@
 """Small binding head and PyTorch training loop. No Protenix import at module level."""
 from contextlib import contextmanager, nullcontext
-from collections import defaultdict
+import datetime
 import hashlib
 import json
 import math
@@ -13,8 +13,17 @@ from torch import nn
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 
-from .data import (binding_key, predictable, prediction_report, row_hash, synthetic_eligible,
-                   task_name, trainable, validate_rows, write_json)
+from .data import (binding_key, build_buckets, packet_name, predictable, prediction_report, row_hash,
+                   sample_row, selection_scores, structure_eligible, synthetic_eligible, task_name,
+                   training_rows, validate_rows, write_json)
+from .synthetic import place_packet
+
+try:
+    import numpy as np  # Native Protenix uses numpy RNGs as well.
+except ImportError:  # CPU-only unit tests may lack numpy
+    np = None
+
+SEED_SCHEME = 2  # micro_seed hashing; older checkpoints used additive seeds and cannot resume
 
 
 @contextmanager
@@ -22,10 +31,6 @@ def encoder_rng(key, device):
     """Native MSA sampling remains random in eval; isolate a stable input seed."""
     seed = int(hashlib.sha256(key.encode()).hexdigest()[:8], 16)
     python_state = random.getstate()
-    try:
-        import numpy as np
-    except ImportError:
-        np = None
     numpy_state = np.random.get_state() if np is not None else None
     devices = [device.index if device.index is not None else torch.cuda.current_device()] \
         if device.type == 'cuda' else []
@@ -108,7 +113,8 @@ class FineTuner(nn.Module):
                 pooled = pool_interface(single, pair, features)
             if self.mode == 'head' and cache_key is not None:
                 self._pooled_cache[cache_key] = pooled.detach().cpu()
-        logit = self.head(pooled)[self.task_names.index(task)]
+        with torch.autocast(pooled.device.type, enabled=False):  # bf16 logits would quantize scores into ties
+            logit = self.head(pooled)[self.task_names.index(task)]
         structural = logit.new_zeros(())
         if positive_structure is not None:
             structural = self.backend.structure_loss(positive_structure, step)
@@ -139,13 +145,16 @@ def to_device(value, device):
 def load_packet(directory, row, kind, device):
     if kind not in ('binding', 'structure', 'synthetic'):
         raise ValueError('Unknown prepared packet kind')
-    if kind == 'structure' and (row['label'] != '1' or not row.get('structure_id')):
+    if kind == 'structure' and not structure_eligible(row):
         raise ValueError('Only positive experimental complexes can enter the structure branch')
     if kind == 'synthetic' and not synthetic_eligible(row):
         raise ValueError('Only reliable X-ray negatives enter the synthetic comparison branch')
-    path = Path(directory) / f'{row["sample_id"]}.{kind}.pt'
+    path = Path(directory) / packet_name(row, kind)
     packet = torch.load(path, map_location='cpu', weights_only=True)
-    if packet.get('version') != 1 or packet.get('kind') != kind or packet.get('row_hash') != row_hash(row):
+    # Binding features depend only on binding_key; legacy binding packets carry the full row_hash.
+    matches = packet.get('row_hash') == row_hash(row) or (
+        kind == 'binding' and packet.get('binding_key') == binding_key(row))
+    if packet.get('version') != 1 or packet.get('kind') != kind or not matches:
         raise ValueError(f'Stale/mismatched prepared packet: {path}')
     return to_device(packet, device)
 
@@ -217,6 +226,13 @@ def autocast(device, precision):
         if precision == 'bf16' and device.type == 'cuda' else nullcontext()
 
 
+def binding_features(model, directory, row, device):
+    """Head mode ignores features on a pooled-cache hit, so skip loading the packet."""
+    if model.mode == 'head' and binding_key(row) in model._pooled_cache:
+        return None
+    return load_packet(directory, row, 'binding', device)['input_feature_dict']
+
+
 @torch.no_grad()
 def predict(model, rows, feature_dir, device, precision='fp32'):
     model.eval()
@@ -224,7 +240,7 @@ def predict(model, rows, feature_dir, device, precision='fp32'):
     for row in rows:
         if not predictable(row):
             raise ValueError('Phenotypic/excluded observations are not protein predictions')
-        features = load_packet(feature_dir, row, 'binding', device)['input_feature_dict']
+        features = binding_features(model, feature_dir, row, device)
         with autocast(device, precision):
             logit, _ = model(features, cache_key=binding_key(row), task=task_name(row))
         probability = logit.float().sigmoid().item()
@@ -236,26 +252,21 @@ def predict(model, rows, feature_dir, device, precision='fp32'):
 
 def seed_step(seed):
     random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-    # Native Protenix uses numpy as well. CPU-only unit tests do not need it.
-    try:
-        import numpy as np
-    except ImportError:
-        pass
-    else:
+    torch.manual_seed(seed)  # also seeds every CUDA device
+    if np is not None:
         np.random.seed(seed % (2**32))
+
+
+def micro_seed(*parts):
+    """Hash seed components: base seeds k and k+1 must not replay one shifted stream."""
+    return int.from_bytes(hashlib.sha256(':'.join(map(str, parts)).encode()).digest()[:8], 'little')
 
 
 def run_training(model, rows, feature_dir, args, metadata):
     validate_rows(rows, require_splits=True)
-    train = [r for r in rows if r['split'] == 'train' and trainable(r)]
-    validation = [r for r in rows if r['split'] == 'val' and trainable(r)]
-    positives = [r for r in train if r['label'] == '1' and r.get('structure_id')]
+    train, validation = training_rows(rows)
+    positives = [r for r in train if structure_eligible(r)]
     negatives = [r for r in train if synthetic_eligible(r)]
-    if {r['label'] for r in train} != {'0', '1'} or {r['label'] for r in validation} != {'0', '1'}:
-        raise ValueError('Training and validation each need both reliable classes; revise group splits or collect more hits')
     if args.mode == 'joint' and not positives:
         raise ValueError('Joint training needs positive experimental training structures')
     training_tasks = {task_name(r) for r in train}
@@ -264,22 +275,22 @@ def run_training(model, rows, feature_dir, args, metadata):
     for task in training_tasks:
         for name, records in (('train', train), ('val', validation)):
             if {r['label'] for r in records if task_name(r) == task} != {'0', '1'}:
-                raise ValueError(f'{task}: {name} needs both reliable classes')
+                raise ValueError(f'{task}: {name} needs both reliable classes; revise group splits or collect more hits')
     if args.negative_mode == 'synthetic' and not negatives:
         raise ValueError('Synthetic comparison needs reliable X-ray training negatives')
-    buckets = {}
-    for row in train:
-        target = buckets.setdefault(task_name(row), {}).setdefault(row['target_id'], {})
-        target.setdefault((row.get('source', ''), row.get('assay_id', '')), []).append(row)
-    # Select task, then target, then assay uniformly; large campaigns cannot dominate by row count.
-    buckets = [[list(target.values()) for target in task.values()] for task in buckets.values()]
+    buckets = build_buckets(train)
+    select = args.select_metric
     world, rank = int(os.environ.get('WORLD_SIZE', '1')), int(os.environ.get('RANK', '0'))
     local_rank = int(os.environ.get('LOCAL_RANK', '0'))
     device = torch.device(f'cuda:{local_rank}' if args.device == 'cuda' else args.device)
+    # The checkpoint records how it was produced, whatever the caller already put in metadata.
+    metadata = dict(metadata, seed_scheme=SEED_SCHEME,
+                    effective_precision='bf16' if args.precision == 'bf16' and device.type == 'cuda' else 'fp32')
     if device.type == 'cuda':
         torch.cuda.set_device(device)
     if world > 1:
-        dist.init_process_group('nccl' if device.type == 'cuda' else 'gloo')
+        dist.init_process_group('nccl' if device.type == 'cuda' else 'gloo',
+                                timeout=datetime.timedelta(minutes=args.dist_timeout_minutes))
     output = Path(args.output)
     try:
         if rank == 0:
@@ -293,38 +304,45 @@ def run_training(model, rows, feature_dir, args, metadata):
         if backbone_parameters:
             groups.append({'params': backbone_parameters, 'lr': args.backbone_lr})
         optimizer = torch.optim.AdamW(groups, weight_decay=args.weight_decay)
-        start, best = 0, float('inf')
+        start, best_loss = 0, float('inf')
+        best = float('-inf') if select == 'average_precision' else float('inf')
         if args.resume:
             payload = torch.load(args.resume, map_location='cpu', weights_only=True)
+            if payload['metadata'].get('seed_scheme') != SEED_SCHEME:
+                raise ValueError('Checkpoint predates seed_scheme 2 and cannot resume its sampling stream; '
+                                 'continue with --init-checkpoint and a new --output')
             if payload['metadata'] != metadata:
                 raise ValueError('Resume metadata differs: preserve data, base weights, model and training settings')
             load_delta(model, payload)
             optimizer.load_state_dict(payload['optimizer'])
-            start, best = payload['step'], payload['best_validation_loss']
+            start, best, best_loss = payload['step'], payload['best_selection_score'], payload['best_validation_loss']
+            # Fail now, not at the first eval after the compute is spent.
+            later = sorted(p.name for p in output.glob('step_*') if p.stem[5:].isdigit() and int(p.stem[5:]) > start)
+            if later:
+                raise FileExistsError(f'{output} already has {later[0]} after step {start}; resume into a new --output')
         if start >= args.steps:
             raise ValueError('--steps must exceed the checkpoint step')
         if rank == 0:
             write_json(output / f'run_from_{start:06d}.json', metadata)
         wrapped = DistributedDataParallel(model, device_ids=[local_rank] if device.type == 'cuda' else None,
                                            find_unused_parameters=True) if world > 1 else model
+        window = [0.0, 0]  # this rank's train loss sum and sample count since the last eval
         for step in range(start, args.steps):
             model.train()
             optimizer.zero_grad(set_to_none=True)
-            running = 0.0
             for micro in range(args.accumulate):
-                seed = args.seed + (step * args.accumulate + micro) * world + rank
+                seed = micro_seed(args.seed, step, micro, rank)
                 seed_step(seed)
                 rng = random.Random(seed)
-                row = rng.choice(rng.choice(rng.choice(rng.choice(buckets)))) \
-                    if args.sampling == 'assay' else rng.choice(train)
-                features = load_packet(feature_dir, row, 'binding', device)['input_feature_dict']
+                row = sample_row(buckets, train, rng, args.sampling)
+                features = binding_features(model, feature_dir, row, device)
                 structure = load_packet(feature_dir, rng.choice(positives), 'structure', device) \
                     if args.mode == 'joint' else None
                 synthetic = None
                 if args.negative_mode == 'synthetic':
-                    from .synthetic import place_packet
                     synthetic = place_packet(load_packet(feature_dir, rng.choice(negatives), 'synthetic', device),
-                                             args.synthetic_distance, seed + args.placement_seed)
+                                             args.synthetic_distance,
+                                             micro_seed('placement', args.seed, args.placement_seed, step, micro, rank))
                 sync = wrapped.no_sync() if world > 1 and micro + 1 < args.accumulate else nullcontext()
                 with sync:
                     with autocast(device, args.precision):
@@ -336,28 +354,40 @@ def run_training(model, rows, feature_dir, args, metadata):
                     if not torch.isfinite(loss):
                         raise ValueError(f'Non-finite loss at step {step}, sample {row["sample_id"]}')
                     (loss / args.accumulate).backward()
-                running += loss.detach().float().item() / args.accumulate
+                window[0] += loss.detach().float().item()
+                window[1] += 1
             torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad],
                                           args.clip_grad, error_if_nonfinite=True)
             optimizer.step()
             if (step + 1) % args.eval_every == 0 or step + 1 == args.steps:
+                # Every rank scores a shard, so no rank waits in a collective through a whole validation pass.
+                part = (predict(model, validation[rank::world], feature_dir, device, args.precision), window)
+                parts = [part]
+                if world > 1:
+                    parts = [None] * world
+                    dist.all_gather_object(parts, part)
+                window = [0.0, 0]
                 if rank == 0:
-                    predictions = predict(model, validation, feature_dir, device, args.precision)
+                    predictions = [None] * len(validation)
+                    for index, (shard, _) in enumerate(parts):
+                        predictions[index::world] = shard
                     report = prediction_report(predictions, k=args.top_k)
-                    # Equal task weight, then equal weight for each target/assay within task.
-                    task_losses = defaultdict(list)
-                    for item in report.values():
-                        task_losses[item['task']].append(item['log_loss'])
-                    score = sum(sum(values)/len(values) for values in task_losses.values()) / len(task_losses)
-                    improved = score < best
-                    best = min(best, score)
+                    scores = selection_scores(report)
+                    score = scores[select]
+                    improved = score > best if select == 'average_precision' else score < best
+                    best = score if improved else best
+                    best_loss = min(best_loss, scores['log_loss'])
                     checkpoint = output / f'step_{step + 1:06d}.pt'
-                    save_checkpoint(checkpoint, checkpoint_payload(model, optimizer, step + 1, metadata, best))
+                    save_checkpoint(checkpoint, checkpoint_payload(model, optimizer, step + 1, metadata, best_loss)
+                                    | {'best_selection_score': best, 'select_metric': select})
                     write_json(output / f'step_{step + 1:06d}.json', {
-                        'step': step + 1, 'rank0_train_loss': running, 'validation': report,
-                        'macro_validation_log_loss': score, 'best_so_far': improved,
-                        'checkpoint': checkpoint.name, 'predictions': predictions})
-                    print(json.dumps({'step': step + 1, 'validation_loss': score,
+                        'step': step + 1,
+                        'mean_train_loss_since_last_eval': sum(p[1][0] for p in parts) / sum(p[1][1] for p in parts),
+                        'validation': report, 'macro_validation_average_precision': scores['average_precision'],
+                        'macro_validation_log_loss': scores['log_loss'], 'select_metric': select,
+                        'best_so_far': improved, 'checkpoint': checkpoint.name, 'predictions': predictions})
+                    print(json.dumps({'step': step + 1, 'validation_loss': scores['log_loss'],
+                                      'validation_average_precision': scores['average_precision'],
                                       'best_so_far': improved, 'checkpoint': str(checkpoint)}), flush=True)
                 if world > 1:
                     dist.barrier()
