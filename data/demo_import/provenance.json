@@ -1,0 +1,127 @@
+{
+  "inputs": {
+    "/Users/donghanlee/work/projects/protenixfinetune/examples/general_screen.csv": "1e2923f90082bee9bd2360182472d73fade7dfff983058cf35b95c391a4f337d"
+  },
+  "mapping": {
+    "columns": {
+      "sample_id": "Sample",
+      "target_id": "Target",
+      "target_group": "TargetGroup",
+      "ligand_id": "Compound",
+      "smiles": "SMILES",
+      "chem_group": "ChemGroup",
+      "assay_id": "Assay",
+      "assay_type": "AssayType",
+      "endpoint": "Endpoint",
+      "quality": "QC"
+    },
+    "constants": {
+      "campaign_id": "demo_2026",
+      "source": "fictional_demo",
+      "source_url": "https://example.org/fictional-screen",
+      "weight": "1",
+      "concentration": "10",
+      "concentration_unit": "mM"
+    },
+    "outcome_column": "Outcome",
+    "outcomes": {
+      "Active": "1",
+      "Inactive": "0",
+      "Inconclusive": "uncertain",
+      "NotTested": "unknown"
+    }
+  },
+  "compound_table_sha256": null,
+  "manifest_sha256": "4f59250cc5ee37325409e781758cf69c66e274d7e626c3490263f4b506754fb2",
+  "explicitly_skipped_rows": 0,
+  "summary": {
+    "samples": 147,
+    "ligands": 12,
+    "chemistry_groups": 6,
+    "eligible_observations": 144,
+    "tasks": {
+      "xray:hit": 72,
+      "biochemical:inhibition": 72
+    },
+    "counts": [
+      {
+        "target": "A",
+        "split": "unassigned",
+        "label": "0",
+        "n": 14
+      },
+      {
+        "target": "A",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      },
+      {
+        "target": "A",
+        "split": "unassigned",
+        "label": "uncertain",
+        "n": 1
+      },
+      {
+        "target": "B",
+        "split": "unassigned",
+        "label": "0",
+        "n": 12
+      },
+      {
+        "target": "B",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      },
+      {
+        "target": "C",
+        "split": "unassigned",
+        "label": "0",
+        "n": 12
+      },
+      {
+        "target": "C",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      },
+      {
+        "target": "D",
+        "split": "unassigned",
+        "label": "0",
+        "n": 12
+      },
+      {
+        "target": "D",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      },
+      {
+        "target": "E",
+        "split": "unassigned",
+        "label": "0",
+        "n": 12
+      },
+      {
+        "target": "E",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      },
+      {
+        "target": "F",
+        "split": "unassigned",
+        "label": "0",
+        "n": 12
+      },
+      {
+        "target": "F",
+        "split": "unassigned",
+        "label": "1",
+        "n": 12
+      }
+    ]
+  }
+}

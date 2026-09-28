@@ -1,0 +1,8 @@
+{
+  "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/2244/description/JSON",
+  "final_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/2244/description/JSON",
+  "sha256": "1d3536dfde4dc9a7c2a54a1e3282e60f041b7e935a46e8bc0cc8ab52283a7db5",
+  "bytes": 17778,
+  "content_type": "application/json",
+  "retrieved_utc": "2026-09-17T03:31:39.833935+00:00"
+}

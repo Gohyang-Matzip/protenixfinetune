@@ -1,0 +1,8 @@
+{
+  "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/2244/CSV",
+  "final_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/2244/CSV",
+  "sha256": "e77812a7a39b94620df94c5d28b6eaa1eb3079164490627e92333928798f8f10",
+  "bytes": 18455,
+  "content_type": "text/csv",
+  "retrieved_utc": "2026-09-17T03:31:41.287953+00:00"
+}
