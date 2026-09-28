@@ -1,7 +1,9 @@
 """Opt-in artificial unbound-state ablation, never experimental ground truth."""
 import copy
+from functools import lru_cache
 import math
-import torch
+
+from .data import synthetic_eligible
 
 
 def residue_mapping(sequence_ids, apo):
@@ -24,6 +26,7 @@ def residue_mapping(sequence_ids, apo):
 
 def detached_coordinates(coordinates, protein_mask, ligand_mask, clearance=40.0, seed=42):
     """Keep receptor fixed; rotate ligand rigidly and put bounding spheres apart."""
+    import torch
     if not math.isfinite(clearance) or clearance <= 0:
         raise ValueError('Synthetic clearance must be positive and finite')
     if coordinates.ndim != 2 or coordinates.shape[1] != 3 or not torch.isfinite(coordinates).all():
@@ -54,7 +57,8 @@ def place_packet(packet, clearance, seed):
     """Only label coordinates change. Native input conformers/templates stay identical."""
     if packet.get('kind') != 'synthetic':
         raise ValueError('Only explicitly synthetic packets can be relocated')
-    result = copy.deepcopy(packet)
+    # Copy only the label dicts that change; feature tensors are shared read-only, not duplicated.
+    result = dict(packet, label_dict=dict(packet['label_dict']), label_full_dict=dict(packet['label_full_dict']))
     features = result['input_feature_dict']
     labels = result['label_dict']
     coordinates = detached_coordinates(
@@ -67,30 +71,15 @@ def place_packet(packet, clearance, seed):
     return result
 
 
-def native_synthetic_packet(row, target, features, atom_array):
-    """Map observed apo atoms onto the native sequence/SMILES atom order.
-
-    Supports one noncovalent ligand and one unmodified protein chain. Explicit
-    residue mapping avoids guessing sequence alignments or insertion codes.
-    """
-    import numpy as np
+# ponytail: 16 parsed apo chains are kept; add grouping by target if corpora exceed that.
+@lru_cache(maxsize=16)
+def apo_atoms(path, chain_id):
+    """Observed apo atoms by (res_id, atom_name), parsed once per structure."""
     from biotite.structure.io import load_structure
-    from protenix.data.core.featurizer import Featurizer
-    from protenix.data.utils import data_type_transform, make_dummy_feature
-    from .data import row_hash, synthetic_eligible
-    from .protenix_adapter import tensor_tree
-
-    if not synthetic_eligible(row):
-        raise ValueError('Synthetic labels require a reliable X-ray negative')
-    apo = target.get('apo')
-    if not apo or not apo.get('path') or not apo.get('chain_id'):
-        raise ValueError(f'{row["target_id"]}: synthetic preparation requires apo.path and apo.chain_id')
-    if target.get('count', 1) != 1 or target.get('modifications'):
-        raise ValueError('Synthetic preparation currently requires one unmodified protein chain')
-    observed = load_structure(apo['path'], model=1, altloc='occupancy')
-    observed = observed[observed.chain_id == apo['chain_id']]
+    observed = load_structure(path, model=1, altloc='occupancy')
+    observed = observed[observed.chain_id == chain_id]
     if not len(observed):
-        raise ValueError(f'No apo atoms in chain {apo["chain_id"]}')
+        raise ValueError(f'No apo atoms in chain {chain_id}')
     if any(str(code).strip() for code in observed.ins_code):
         raise ValueError('Apo insertion codes need explicit renumbering before synthetic preparation')
     lookup = {}
@@ -99,6 +88,33 @@ def native_synthetic_packet(row, target, features, atom_array):
         if key in lookup:
             raise ValueError(f'Ambiguous apo atom {key}; resolve alternate conformations first')
         lookup[key] = atom
+    return lookup
+
+
+def apo_lookup(target_id, target):
+    """Checked apo settings and atom lookup; prepare calls this for every target before featurizing."""
+    apo = target.get('apo')
+    if not apo or not apo.get('path') or not apo.get('chain_id'):
+        raise ValueError(f'{target_id}: synthetic preparation requires apo.path and apo.chain_id')
+    if target.get('count', 1) != 1 or target.get('modifications'):
+        raise ValueError('Synthetic preparation currently requires one unmodified protein chain')
+    return apo, apo_atoms(apo['path'], apo['chain_id'])
+
+
+def native_synthetic_packet(row, target, features, atom_array):
+    """Map observed apo atoms onto the native sequence/SMILES atom order.
+
+    Supports one noncovalent ligand and one unmodified protein chain. Explicit
+    residue mapping avoids guessing sequence alignments or insertion codes.
+    """
+    import numpy as np
+    import torch
+    from protenix.data.core.featurizer import Featurizer
+    from protenix.data.utils import data_type_transform, make_dummy_feature
+
+    if not synthetic_eligible(row):
+        raise ValueError('Synthetic labels require a reliable X-ray negative')
+    apo, lookup = apo_lookup(row['target_id'], target)
     array = atom_array.copy()
     protein = features['is_protein'].bool()
     ligand = features['is_ligand'].bool()
@@ -148,7 +164,7 @@ def native_synthetic_packet(row, target, features, atom_array):
         permutations.append([counts.get(uid, 0)])
         counts[uid] = counts.get(uid, 0) + 1
     inputs['atom_perm_list'] = permutations
-    return {'version': 1, 'kind': 'synthetic', 'row_hash': row_hash(row),
-            'apo_ca_coverage': coverage, 'input_feature_dict': tensor_tree(inputs),
+    # prepare adds the packet header and converts numpy leaves (tensor_tree).
+    return {'apo_ca_coverage': coverage, 'input_feature_dict': inputs,
             'label_dict': {'coordinate': torch.tensor(coordinates), 'coordinate_mask': torch.tensor(mask)},
-            'label_full_dict': tensor_tree(full_labels)}
+            'label_full_dict': full_labels}

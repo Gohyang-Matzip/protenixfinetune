@@ -1,6 +1,6 @@
 # 범용 screening 모델 연구계획
 
-업데이트: 2026-09-17. 사용 가능 자원: H100 16장, 4개월. 목표는 공개 fragment screening·repurposing 자료에서 학습하고 새로운 표적·화합물 및 자체 X-ray 자료로 전이할 수 있는 프로그램과 검증된 모델입니다. 프로그램 구현과 모델 성능 입증은 별개의 산출물입니다.
+업데이트: 2026-09-28. 사용 가능 자원: H100 16장, 4개월. 목표는 공개 fragment screening·repurposing 자료에서 학습하고 새로운 표적·화합물 및 자체 X-ray 자료로 전이할 수 있는 프로그램과 검증된 모델입니다. 프로그램 구현과 모델 성능 입증은 별개의 산출물입니다.
 
 개인 자료는 두 표적, 공통 fragment 약 300종, X-ray 및 실제 apo 구조이며 양성 수는 아직 미정입니다. 이 자료는 개인 적용·전이 평가에 사용합니다. 두 표적만으로 범용 protein 일반화를 입증하지 않습니다. [기존 연구계획](docs/archive/two_target_research_plan_20260916.md)은 보관했습니다.
 
@@ -23,8 +23,8 @@ Ligand-only·표적 hit-rate 같은 단순 baseline도 최종 연구에 포함�
 
 1. PubChem·LIT-PCBA·NCATS와 공개 fragment screening에서 **실측 관측 목록**을 확보합니다. 구조가 없다는 이유로 음성을 만들지 않습니다. 원본·라이선스·hash·mapping·제외 이유를 남깁니다.
 2. Assay 의미와 판정 규칙을 정하고 X-ray/직접 결합/biochemical을 분리합니다. Phenotypic 결과는 저장하되 protein 학습에서 제외합니다. 승인약 metadata는 화학공간 분석용으로 별도 보존합니다.
-3. 표적 construct·화학 ID·유사성 그룹을 전역 정리합니다. 양성·음성·불확실 수와 독립 group 수, 반복 관측·상충 결과·출처 중복을 감사합니다.
-4. Cold chemistry, cold target, both 평가 세트를 고정하고 개인 test와 공개 pretraining train의 중복도 확인합니다. 사전학습 Protenix의 데이터 중복 가능성은 별도로 기록합니다.
+3. 표적 construct·화학 ID·유사성 그룹을 전역 정리합니다. 양성·음성·불확실 수와 독립 group 수, 반복 관측·상충 결과·출처 중복을 감사합니다. 같은 관측의 상충 label은 프로그램이 거부하므로 검토해 `uncertain`으로 표시하고, 출처 간 중복은 직접 정리합니다.
+4. Cold chemistry, cold target, both 평가 세트를 고정하고 개인 test와 공개 pretraining train의 중복도 `audit --against`로 확인합니다. 사전학습 Protenix의 데이터 중복 가능성은 별도로 기록합니다.
 5. 기존 서버의 Protenix를 연결해 양성/음성/apo 최소 사례로 feature·loss·gradient·save/resume·prediction을 실행합니다. GPU peak memory와 실제 step 시간을 측정합니다.
 
 종료 조건: versioned corpus/분할, assay label 정의서, native 1-GPU smoke 결과. 이 조건 전에는 16장을 장기간 예약 학습에 쓰지 않습니다.
@@ -33,7 +33,7 @@ Ligand-only·표적 hit-rate 같은 단순 baseline도 최종 연구에 포함�
 
 개인-only head와 public→personal head를 동일 held-out 관측에서 비교합니다. 공개 corpus는 task/target/assay 균형 sampling을 기본으로 사용하고 uniform과 비교합니다. 각 task train/val에 두 class가 있어야 하며 없는 task는 자료를 추가하거나 별도 실험으로 분리합니다.
 
-평가 지표는 source/표적/task/assay별 average precision, Brier, log loss, precision/recall/enrichment@K입니다. 현재 checkpoint 선택은 task macro validation log loss입니다. K와 subset은 실험 전에 정하고 test로 조정하지 않습니다. 신뢰구간은 독립 화학/표적 그룹 단위 bootstrap으로 후속 분석하며 현재 CLI에는 구현하지 않았습니다.
+평가 지표는 split/source/표적/task/assay별 average precision, AUROC, Brier, log loss, precision/recall/enrichment@K, enrichment@1%입니다. 현재 checkpoint 선택 기본값은 task macro validation average precision이며 `--select-metric log_loss`로 바꿀 수 있습니다. K와 subset은 실험 전에 정하고 test로 조정하지 않습니다. 신뢰구간은 독립 화학/표적 그룹 단위 bootstrap으로 후속 분석하며 현재 CLI에는 구현하지 않았습니다.
 
 종료 조건: 개인-only 대비 공개 전이의 이득/손해를 target·fragment subset별로 제시. 큰 공개 corpus의 평균만 좋아졌다는 이유로 개인 성능 개선을 주장하지 않습니다.
 

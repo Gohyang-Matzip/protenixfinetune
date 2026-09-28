@@ -11,3 +11,8 @@ checkpoints/
 *.ccp4
 *.map
 *.partial
+*.egg-info/
+build/
+dist/
+# data/ is published; keep unpublished inputs here or outside the repository.
+private/

@@ -23,4 +23,4 @@ Preserve legacy inputs and checkpoints; archive superseded documents. No implici
 
 The prior discussion and explicit implementation request supply design approval. Execution is inline; the folder is not a Git checkout, so no commits/worktrees are created.
 
-Completed 2026-09-17. See [verification record](../../VALIDATION.md): 22 existing-Torch CPU tests pass; standard Python passes 13 and skips 9. Native Protenix/GPU execution remains outside this local verification.
+Completed 2026-09-17. See [verification record](../../../VALIDATION.md): 22 existing-Torch CPU tests pass; standard Python passes 13 and skips 9. Native Protenix/GPU execution remains outside this local verification.

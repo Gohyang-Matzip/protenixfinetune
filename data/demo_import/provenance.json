@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "/Users/donghanlee/work/projects/protenixfinetune/examples/general_screen.csv": "1e2923f90082bee9bd2360182472d73fade7dfff983058cf35b95c391a4f337d"
+    "examples/general_screen.csv": "1e2923f90082bee9bd2360182472d73fade7dfff983058cf35b95c391a4f337d"
   },
   "mapping": {
     "columns": {
@@ -31,14 +31,19 @@
       "NotTested": "unknown"
     }
   },
+  "mapping_sha256": "ab3aa8b82df7d7e320432a3e8f866c271456d3dab76db7674e6ba343d41851f0",
   "compound_table_sha256": null,
   "manifest_sha256": "4f59250cc5ee37325409e781758cf69c66e274d7e626c3490263f4b506754fb2",
   "explicitly_skipped_rows": 0,
+  "conflicting_labels": "error",
+  "replicate_keys": 0,
+  "conflicting_keys": 0,
   "summary": {
     "samples": 147,
     "ligands": 12,
     "chemistry_groups": 6,
     "eligible_observations": 144,
+    "replicate_observations": 0,
     "tasks": {
       "xray:hit": 72,
       "biochemical:inhibition": 72

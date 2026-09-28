@@ -27,7 +27,7 @@ PyTorch가 있는 Python으로 테스트하면 미분, 실제 학습 루프, syn
 
 ## 1. 데이터 목록
 
-[examples/manifest.csv](examples/manifest.csv)를 복사해 실제 데이터를 기록합니다.
+[examples/manifest.csv](../../examples/manifest.csv)를 복사해 실제 데이터를 기록합니다.
 
 | 열 | 의미 |
 |---|---|
@@ -56,7 +56,7 @@ python3 -m fragment_ft split data/manifest.csv \
 
 ## 2. 표적별 공통 입력과 apo
 
-[examples/targets.json](examples/targets.json)의 서열을 실제 서열로 바꿉니다. 각 target에는 Protenix `proteinChain` 항목을 넣습니다. `pairedMsaPath`, `unpairedMsaPath`, `templatesPath`를 추가하면 표적의 모든 fragment에 같은 입력을 사용합니다. 파일 경로는 targets JSON에 상대적이며, 로딩할 때 절대 경로로 변환됩니다. 로컬 MSA/template가 없으면 sequence-only 입력입니다.
+[examples/targets.json](../../examples/targets.json)의 서열을 실제 서열로 바꿉니다. 각 target에는 Protenix `proteinChain` 항목을 넣습니다. `pairedMsaPath`, `unpairedMsaPath`, `templatesPath`를 추가하면 표적의 모든 fragment에 같은 입력을 사용합니다. 파일 경로는 targets JSON에 상대적이며, 로딩할 때 절대 경로로 변환됩니다. 로컬 MSA/template가 없으면 sequence-only 입력입니다.
 
 Synthetic 비교를 위해서는 target마다 `apo`를 추가합니다.
 

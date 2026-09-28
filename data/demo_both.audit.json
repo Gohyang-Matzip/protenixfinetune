@@ -69,5 +69,9 @@
       "targets": 6,
       "chemistry_groups": 6
     }
+  },
+  "molecule_identity": {
+    "checked": true,
+    "molecules": 12
   }
 }
