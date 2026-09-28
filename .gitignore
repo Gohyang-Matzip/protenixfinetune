@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+data/
+prepared/
+runs/
+checkpoints/
+*.pt
+*.pkl
+*.pkl.gz
+*.mtz
+*.ccp4
+*.map
+*.partial
