@@ -1,0 +1,26 @@
+{
+  "A": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYA",
+    "count": 1
+  },
+  "B": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYC",
+    "count": 1
+  },
+  "C": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYD",
+    "count": 1
+  },
+  "D": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYE",
+    "count": 1
+  },
+  "E": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYF",
+    "count": 1
+  },
+  "F": {
+    "sequence": "ACDEFGHIKLMNPQRSTVWYG",
+    "count": 1
+  }
+}

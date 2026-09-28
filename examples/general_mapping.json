@@ -1,0 +1,29 @@
+{
+  "columns": {
+    "sample_id": "Sample",
+    "target_id": "Target",
+    "target_group": "TargetGroup",
+    "ligand_id": "Compound",
+    "smiles": "SMILES",
+    "chem_group": "ChemGroup",
+    "assay_id": "Assay",
+    "assay_type": "AssayType",
+    "endpoint": "Endpoint",
+    "quality": "QC"
+  },
+  "constants": {
+    "campaign_id": "demo_2026",
+    "source": "fictional_demo",
+    "source_url": "https://example.org/fictional-screen",
+    "weight": "1",
+    "concentration": "10",
+    "concentration_unit": "mM"
+  },
+  "outcome_column": "Outcome",
+  "outcomes": {
+    "Active": "1",
+    "Inactive": "0",
+    "Inconclusive": "uncertain",
+    "NotTested": "unknown"
+  }
+}

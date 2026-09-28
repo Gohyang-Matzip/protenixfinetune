@@ -1,0 +1,7 @@
+{
+  "model": {"N_cycle": 4},
+  "diffusion_batch_size": 4,
+  "triangle_attention": "torch",
+  "triangle_multiplicative": "torch",
+  "data": {"template": {"fetch_remote": false}}
+}

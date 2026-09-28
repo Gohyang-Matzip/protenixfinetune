@@ -1,0 +1,13 @@
+sample_id,target_id,ligand_id,smiles,chem_group,label,split,structure_id,protein_chain_id,ligand_chain_id
+A_F001,A,F001,c1ccccc1,G01,1,train,,,
+B_F001,B,F001,c1ccccc1,G01,0,train,,,
+A_F002,A,F002,CCO,G02,0,train,,,
+B_F002,B,F002,CCO,G02,1,train,,,
+A_F003,A,F003,c1ccncc1,G03,1,val,,,
+B_F003,B,F003,c1ccncc1,G03,0,val,,,
+A_F004,A,F004,CC(=O)N,G04,0,val,,,
+B_F004,B,F004,CC(=O)N,G04,1,val,,,
+A_F005,A,F005,C1CCCCC1,G05,1,test,,,
+B_F005,B,F005,C1CCCCC1,G05,0,test,,,
+A_F006,A,F006,CC(C)O,G06,uncertain,test,,,
+B_F006,B,F006,CC(C)O,G06,unknown,test,,,
