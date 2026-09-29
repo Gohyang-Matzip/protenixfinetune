@@ -13,6 +13,8 @@ GitHub: https://github.com/Gohyang-Matzip/protenixfinetune
 | 학습 | frozen head 또는 양성 구조 + 다중 task 판별; task/표적/assay 균형 sampling |
 | 전이 | `--init-checkpoint`로 공유 표현 전달, 새 task 출력 초기화; 별도 `--resume` |
 | 평가 | cold chemistry / cold target / both 분할, split·assay별 AP·AUROC·enrichment, 동일 평가목록 비교, corpus 간 누출 감사 |
+| Baseline | train-only 표적 hit-rate, ligand-only, 외부 Protenix ipTM/PAE/pLDDT zero-shot 점수 비교 |
+| Embedding | `embed` 샤딩·디스크 저장 후 Protenix 없는 CPU head 학습·예측 |
 | 인공 음성 | 실제 apo에 ligand를 멀리 배치하는 opt-in 구조 ablation |
 
 `xray:hit`, `direct_binding:binding`, `biochemical:inhibition`은 각각 다른 출력입니다. Cell viability 같은 phenotypic 관측은 원본·manifest에 보존하지만 protein 학습에서 제외합니다. FDA 승인 여부나 assay의 `Inactive`만으로 비결합을 판정하지 않습니다.
@@ -36,7 +38,7 @@ python3 -m unittest discover -s tests -v
 
 모든 출력 명령은 기존 파일을 덮어쓰지 않으므로 재실행할 때는 새 `OUT`을 만드세요. `both`는 두 축을 따로 나눈 뒤 train/train, val/val, test/test 조합만 사용하고 나머지를 `excluded`로 보존합니다. 각 task의 train/val 양성·음성 수는 `audit`에서 확인합니다.
 
-테스트는 93개입니다. PyTorch·RDKit가 없는 Python은 Torch 의존 테스트 21개와 RDKit 테스트 1개를 skip하고, PyTorch·RDKit 환경(Python 3.9.6, Torch 2.8.0 CPU, RDKit 2025.09.2)에서는 모두 실행해 통과했습니다. 실제 Protenix checkpoint, CIF/apo 전처리, CUDA/BF16·NCCL 다중 GPU는 아직 실행 검증하지 않았습니다. [검증 기록](docs/VALIDATION.md)을 확인하세요.
+테스트 수와 환경별 통과·skip 결과는 [검증 기록](docs/VALIDATION.md)에서 관리합니다. PyTorch·RDKit가 없는 Python은 해당 의존성의 검사를 skip합니다. 실제 Protenix checkpoint, CIF/apo 전처리, CUDA/BF16·NCCL 다중 GPU는 아직 실행 검증하지 않았습니다.
 
 설치하면 `fragment-ft` 명령과 RDKit가 함께 설치됩니다. RDKit로 `audit`와 `prepare`가 SMILES 표기가 달라도 같은 분자(InChIKey)를 찾아 chem_group 불일치를 검사합니다. 학습 환경에서는 `-e '.[train]'`으로 torch, numpy도 함께 설치합니다.
 
@@ -55,6 +57,7 @@ python3 -m pip install -e .
 
 - [데이터 수집과 라벨 규칙](docs/DATA.md): PubChem·LIT-PCBA·NCATS·PRISM, CSV schema, 그룹 분할, 원본 추적.
 - [학습·전이·평가 실행](docs/TRAINING.md): 서버 준비, task head, joint/synthetic 비교, checkpoint, torchrun.
+- [Baseline 실행](docs/BASELINES.md): zero-shot 점수 schema, train-only hit-rate·ligand 모델, 동일 관측 비교.
 - [4개월 연구·검증 계획](FINETUNING_PLAN.md): 공개 사전학습, cold 평가, 두 표적 적용, GPU 사용 기준.
 - [검증 기록](docs/VALIDATION.md): 실제로 실행한 검사, 테스트 수, 남은 실제 환경 검증.
 - [보관 문서](docs/archive/): 이전 README·구현 기록·연구계획. 예: [0.2.0 구현 상태](docs/archive/implementation_0.2.md), [이전 두 표적 연구계획](docs/archive/two_target_research_plan_20260916.md).

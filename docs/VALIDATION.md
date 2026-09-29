@@ -1,13 +1,17 @@
 # 검증 기록
 
-검증일: 2026-09-28(이전 기록 2026-09-17). 프로그램 버전: 0.2.0. 로컬 macOS에서 실행했습니다. Protenix와 모델 weight는 설치하거나 내려받지 않았습니다. 사용자 요청으로 저장소 밖 임시 가상환경에만 Torch, NumPy, RDKit를 설치해 테스트했습니다. 공개 데이터의 명시적 API 수집은 2026-09-17에만 수행했습니다. 이 문서가 테스트 수와 남은 검증 항목의 기준입니다.
+검증일: 2026-09-29(이전 기록 2026-09-28, 2026-09-17). 프로그램 버전: 0.2.0. 로컬 macOS에서 실행했습니다. Protenix와 모델 weight는 설치하거나 내려받지 않았습니다. 저장소 밖 임시 가상환경 `/tmp/protenix-p0-validation`에만 Torch, NumPy, RDKit를 설치해 테스트했습니다. 공개 데이터의 명시적 API 수집은 2026-09-17에만 수행했습니다. 이 문서가 테스트 수와 남은 검증 항목의 기준입니다.
 
 ## 실행한 검사
 
 | 실행 | 결과 |
 |---|---|
-| `python3 -m unittest discover -s tests -v` (Torch·RDKit 없음) | 93개 중 71개 통과, Torch 의존 검사 21개와 RDKit 검사 1개 skip |
-| 임시 PyTorch·RDKit 가상환경의 Python으로 같은 명령 | **93개 모두 통과**, skip 0, CPU |
+| `python3 -m unittest discover -s tests -v` (Torch·RDKit 없음) | 114개 중 84개 통과, Torch 의존 검사 27개와 RDKit 검사 3개 skip; 3.148초 |
+| `/tmp/protenix-p0-validation/bin/python -m unittest discover -s tests -v` | **114개 모두 통과**, skip 0, CPU; 5.435초 |
+| 메인 baseline CLI 연결 회귀 검사(`-p test_baselines.py`) | 15개 통과; 시스템 Python은 13개 통과 / RDKit 2개 skip |
+| 별도 프로세스 `train --embeddings` → `predict --embeddings` → baseline 5개 → `compare` | exit 0; mock encoder의 두 디스크 shard로 CPU 학습·예측, prior·ligand·가상 ipTM/PAE/pLDDT와 6개 report 비교 |
+| `compileall -q fragment_ft tests`, `git diff --check`, baseline/embed help | exit 0; 별도 빌드 단계 없음 |
+| LSP diagnostics | basedpyright-langserver 미설치로 실행 불가; 구문 컴파일은 통과 |
 | 새 가상환경에서 `pip install .`(기본 pip 21.2.4)과 pip 업그레이드 후 `pip install -e .` | 둘 다 RDKit 2025.09.2가 함께 설치되고 `fragment-ft audit`가 `molecule_identity.checked: true` 보고. 기본 pip 21.2.4는 `-e` 설치를 거부함 |
 | RDKit 환경에서 세 demo split의 `audit` | 12개 분자 모두 InChIKey 검사 통과(`molecule_identity.checked: true`) |
 | CLI help → CSV import → 세 가지 split → audit → inputs | 모두 exit 0, 아래 결과가 저장소의 demo 출력과 일치 |
@@ -30,12 +34,16 @@
 - Task별 출력 gradient, 공유 hidden 전이, joint에서 학습한 backbone의 frozen 전달과 저장·복원, 구조 loss 경로와 관측 weight.
 - 실제 작은 CPU 학습 루프: checkpoint 선택(`--select-metric`), 재개의 parameter 동등성, 이전 seed 방식 checkpoint와 이후 step 파일이 있는 출력으로의 재개 거부, hash 기반 seed의 독립성. CPU gloo 2-process에서 validation 분할·수집 순서.
 - bf16 autocast에서 fp32 head logit, head mode의 pooled cache에서 packet 재로딩 생략, binding key 기반 packet 검증.
+- 디스크 embedding: 고유 binding key당 1회 encode, shard 조합, 누락·중복·변조·설정/feature 불일치 거부. 로딩 시 검증 후 RAM 재사용, 동일 head의 native/mock 경로와 캐시 경로 예측 일치, Protenix·원본 checkpoint 없는 CPU train/predict/resume/init.
+- Baseline: 표적/task train hit-rate와 cold-target task prior fallback, 실제 RDKit descriptor 모델의 train-only fitting, held-out 변경 불변성, zero-shot 방향·범위·sample 대응·provenance 검사, main CLI와 compare 호환. Zero-shot 숫자는 가상 fixture이며 실제 성능 측정이 아님.
 - CLI를 통한 train/predict/export(작은 대체 backend), 잘못된 옵션의 사전 거부, 학습하지 않은 task 건너뛰기와 manifest 불일치 거부, compare 입력 검사.
 - `prepare`의 사전 검사(출력 생성 전), binding key별 1회 featurize와 train 행에만 구조/synthetic 생성(Protenix stub), strict upstream 설정 key, Protenix source·commit 기록.
 - 양성 구조와 synthetic 분기, apo 매핑의 일대일 정수 제약, 인공 ligand 강체 배치의 내부 거리 보존.
 - README 예제 명령 연쇄의 결과 수(아래 표와 74개 입력).
 
 CPU 대체 backend와 stub의 통과는 Protenix, CUDA 또는 NCCL 호환성을 입증하지 않습니다.
+
+2026-09-29에 기존 demo를 새 임시 경로에서 재생성했습니다. chemistry/target/both split CSV와 audit JSON, inputs JSON은 committed 출력과 byte 단위로 동일하여 교체할 파일이 없었습니다. 과거 패키지 설치·공개 API 검사는 아래에 남긴 이전 실행 기록이며 이번 작업에서 반복하지 않았습니다.
 
 ## CLI 예제 결과
 
