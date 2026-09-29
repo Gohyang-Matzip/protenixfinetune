@@ -24,6 +24,8 @@ def positive_int(text):
 def parser():
     root = argparse.ArgumentParser(description='General screening data and Protenix fine-tuning (no auto-install)')
     commands = root.add_subparsers(dest='command', required=True)
+    from .baselines import register_parser
+    register_parser(commands)
     validate = commands.add_parser('validate', help='Validate labels, identities and existing split leakage; no ML dependencies')
     validate.add_argument('manifest')
     audit = commands.add_parser('audit', help='Check split leakage and report eligible/held-out observations')
@@ -210,6 +212,9 @@ def restore(args, payload):
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        if args.command == 'baseline':
+            from .baselines import run
+            return run(args)
         rows = read_manifest(args.manifest) if hasattr(args, 'manifest') else None
         if args.command == 'validate':
             print(json.dumps(summary(rows), indent=2)); return 0
