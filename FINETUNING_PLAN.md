@@ -1,6 +1,6 @@
 # 범용 screening 모델 연구계획
 
-업데이트: 2026-09-28. 사용 가능 자원: H100 16장, 4개월. 목표는 공개 fragment screening·repurposing 자료에서 학습하고 새로운 표적·화합물 및 자체 X-ray 자료로 전이할 수 있는 프로그램과 검증된 모델입니다. 프로그램 구현과 모델 성능 입증은 별개의 산출물입니다.
+업데이트: 2026-09-29. 사용 가능 자원: H100 16장, 4개월. 목표는 공개 fragment screening·repurposing 자료에서 학습하고 새로운 표적·화합물 및 자체 X-ray 자료로 전이할 수 있는 프로그램과 검증된 모델입니다. 프로그램 구현과 모델 성능 입증은 별개의 산출물입니다.
 
 개인 자료는 두 표적, 공통 fragment 약 300종, X-ray 및 실제 apo 구조이며 양성 수는 아직 미정입니다. 이 자료는 개인 적용·전이 평가에 사용합니다. 두 표적만으로 범용 protein 일반화를 입증하지 않습니다. [기존 연구계획](docs/archive/two_target_research_plan_20260916.md)은 보관했습니다.
 
@@ -17,7 +17,7 @@
 | 동일 corpus uniform vs 균형 sampling | 대형 assay 지배 영향 | `--sampling uniform/assay` |
 | task subset/출처별 ablation | biochemical 추가와 source shift 영향 | 검토한 manifest 부분집합으로 별도 run |
 
-Ligand-only·표적 hit-rate 같은 단순 baseline도 최종 연구에 포함합니다. 이는 현재 CLI에 구현하지 않았으며 실제 benchmark를 준비할 때 기존 도구로 평가합니다. 직접 affinity 회귀, PU learning, 임의 decoy 학습, 전 모델 학습은 현재 구현 범위가 아닙니다.
+Protenix zero-shot(ipTM/PAE/pLDDT), ligand-only, 표적 hit-rate baseline을 1개월차에 먼저 평가합니다. 같은 관측 목록과 고정 split을 사용하고, 학습이 필요한 baseline은 train 관측만 사용합니다. Zero-shot confidence는 보정된 결합 확률이 아니므로 순위 지표와 calibration 지표의 의미를 구분합니다. 직접 affinity 회귀, PU learning, 임의 decoy 학습, 전 모델 학습은 현재 구현 범위가 아닙니다.
 
 ## 1개월차: corpus와 실패 없는 실행
 
@@ -26,8 +26,9 @@ Ligand-only·표적 hit-rate 같은 단순 baseline도 최종 연구에 포함�
 3. 표적 construct·화학 ID·유사성 그룹을 전역 정리합니다. 양성·음성·불확실 수와 독립 group 수, 반복 관측·상충 결과·출처 중복을 감사합니다. 같은 관측의 상충 label은 프로그램이 거부하므로 검토해 `uncertain`으로 표시하고, 출처 간 중복은 직접 정리합니다.
 4. Cold chemistry, cold target, both 평가 세트를 고정하고 개인 test와 공개 pretraining train의 중복도 `audit --against`로 확인합니다. 사전학습 Protenix의 데이터 중복 가능성은 별도로 기록합니다.
 5. 기존 서버의 Protenix를 연결해 양성/음성/apo 최소 사례로 feature·loss·gradient·save/resume·prediction을 실행합니다. GPU peak memory와 실제 step 시간을 측정합니다.
+6. 동일 validation 관측에서 zero-shot 세 점수, ligand-only, hit-rate와 작은 frozen head를 비교합니다. 점수 추출 범위·seed·pose 선택 규칙은 label을 보기 전에 고정합니다. Zero-shot을 넘지 못하면 대규모 학습 전에 표현·데이터·task 가정을 다시 검토하며, 고정 test는 최종 평가까지 사용하지 않습니다.
 
-종료 조건: versioned corpus/분할, assay label 정의서, native 1-GPU smoke 결과. 이 조건 전에는 16장을 장기간 예약 학습에 쓰지 않습니다.
+종료 조건: versioned corpus/분할, assay label 정의서, native 1-GPU smoke 결과, baseline 대비 frozen head의 validation 결과. 이 조건 전에는 16장을 장기간 예약 학습에 쓰지 않습니다.
 
 ## 2개월차: frozen 기준선과 공개 전이
 
@@ -55,6 +56,6 @@ Classifier와 synthetic 비교는 같은 초기값, split, seed, 양성 구조 �
 
 H100 16장을 120일 연속 사용할 경우 계산상 46,080 GPU-hour입니다. 이는 상한 예산이며 실제 사용 가능 시간·메모리·네트워크는 서버 조건에 따릅니다. 처리량을 측정하기 전에 epoch 수·완료 시각·성능을 보장하지 않습니다.
 
-Head 실험은 1장 또는 여러 독립 seed/분할 실험으로 시작합니다. Backbone joint에서 병렬 효율이 확인되면 2→8→16장으로 확장합니다. 서로 다른 실험에 GPU를 나누는 편이 빠른지는 실제 GPU-hour/validation 개선으로 비교합니다. 16장 사용 자체를 목표로 삼지 않습니다.
+Frozen head 실험은 고정 backbone의 pooled embedding을 GPU별로 나누어 한 번 추출하고, 저장된 벡터로 CPU에서 독립 seed/ablation 학습을 수행하는 경로를 우선 측정합니다. Backbone·입력·추출 설정이 바뀌면 embedding도 다시 생성합니다. 추출 시간과 CPU 학습 시간을 따로 기록하며 수 초 완료를 미리 보장하지 않습니다. Backbone joint에서 병렬 효율이 확인되면 2→8→16장으로 확장합니다. 16장 사용 자체를 목표로 삼지 않습니다.
 
 실행 명령은 [학습 문서](docs/TRAINING.md), 데이터 정책은 [데이터 문서](docs/DATA.md)에 있습니다. 현재 실제 checkpoint 학습과 H100 실행은 수행하지 않았습니다.
