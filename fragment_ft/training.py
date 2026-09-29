@@ -64,7 +64,8 @@ def pool_interface(single, pair, features):
 
 
 class FineTuner(nn.Module):
-    def __init__(self, backend, mode='head', trainable_prefixes=(), hidden=128, task_names=('xray:hit',)):
+    def __init__(self, backend, mode='head', trainable_prefixes=(), hidden=128, task_names=('xray:hit',),
+                 embeddings=None):
         super().__init__()
         if mode not in ('head', 'joint') or hidden < 1:
             raise ValueError('mode must be head or joint and hidden must be positive')
@@ -76,7 +77,9 @@ class FineTuner(nn.Module):
         self.task_names = tuple(task_names)
         if not self.task_names or len(set(self.task_names)) != len(self.task_names):
             raise ValueError('task_names must be nonempty and unique')
-        self._pooled_cache = {}
+        if embeddings is not None and mode != 'head':
+            raise ValueError('Disk embeddings require head mode')
+        self._pooled_cache = embeddings if embeddings is not None else {}
         self._inherited_parameter_names = set()
         self.backend.requires_grad_(False)
         for prefix in trainable_prefixes:

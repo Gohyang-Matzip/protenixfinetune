@@ -71,8 +71,9 @@ def parser():
     runtime_options(prepare)
 
     train = commands.add_parser('train', help='Train a frozen binding head or jointly fine-tune selected backbone modules')
-    train.add_argument('manifest'); train.add_argument('--features', required=True)
-    train.add_argument('--base-checkpoint', required=True)
+    train.add_argument('manifest'); train.add_argument('--features')
+    train.add_argument('--base-checkpoint')
+    train.add_argument('--embeddings', nargs='+', help='Verified embedding shard directories; head mode only')
     train.add_argument('--output', required=True)
     starting = train.add_mutually_exclusive_group()
     starting.add_argument('--resume')
@@ -104,8 +105,9 @@ def parser():
     runtime_options(train)
 
     predict = commands.add_parser('predict', help='Predict binding scores and per-target metrics from a trained delta checkpoint')
-    predict.add_argument('manifest'); predict.add_argument('--features', required=True)
-    predict.add_argument('--checkpoint', required=True); predict.add_argument('--base-checkpoint', required=True)
+    predict.add_argument('manifest'); predict.add_argument('--features')
+    predict.add_argument('--embeddings', nargs='+', help='Verified embedding shard directories')
+    predict.add_argument('--checkpoint', required=True); predict.add_argument('--base-checkpoint')
     predict.add_argument('--protenix-source'); predict.add_argument('--output', required=True)
     predict.add_argument('--split', choices=['train', 'val', 'test', 'all'], default='test')
     predict.add_argument('--device', choices=['cpu', 'cuda'], default='cuda')
@@ -113,6 +115,14 @@ def parser():
     predict.add_argument('--top-k', type=positive_int, default=20)
     predict.add_argument('--allow-different-manifest', action='store_true',
                          help='Predict a manifest other than the training one; its val/test rows may have been trained on')
+    embed = commands.add_parser('embed', help='Extract frozen pooled CPU embeddings once per binding key')
+    embed.add_argument('manifest'); embed.add_argument('--features', required=True)
+    embed.add_argument('--base-checkpoint', required=True); embed.add_argument('--output', required=True)
+    embed.add_argument('--device', choices=['cpu', 'cuda'], default='cuda')
+    embed.add_argument('--precision', choices=['fp32', 'bf16'], default='fp32')
+    embed.add_argument('--shard-index', type=int, default=0)
+    embed.add_argument('--shard-count', type=positive_int, default=1)
+    runtime_options(embed)
     export = commands.add_parser('export', help='Merge trained backbone deltas into a native Protenix checkpoint for pose inference')
     export.add_argument('--checkpoint', required=True); export.add_argument('--base-checkpoint', required=True)
     export.add_argument('--protenix-source'); export.add_argument('--output', required=True)
@@ -159,6 +169,8 @@ def read_targets(path):
 
 def check_train_args(args):
     """Cheap flag checks, before features are hashed or the base checkpoint is loaded."""
+    if getattr(args, 'embeddings', None) and (args.mode != 'head' or args.negative_mode != 'classifier'):
+        raise ValueError('Disk embeddings require head/classifier mode')
     for name in ('head_lr', 'backbone_lr', 'clip_grad', 'synthetic_distance'):
         value = getattr(args, name)
         if not math.isfinite(value) or value <= 0:
@@ -286,8 +298,12 @@ def main(argv=None):
             write_json(args.output, comparison); return 0
 
         # Import the optional integration only for commands that actually need it.
-        from .protenix_adapter import build_config, connect_source, native_backend, prepare
-        provenance = connect_source(args.protenix_source)
+        cached = bool(getattr(args, 'embeddings', None))
+        if args.command in ('train', 'predict') and not cached and (not args.features or not args.base_checkpoint):
+            raise ValueError('Native train/predict requires --features and --base-checkpoint')
+        if not cached:
+            from .protenix_adapter import build_config, connect_source, native_backend, prepare
+            provenance = connect_source(args.protenix_source)
         overrides = read_json(args.upstream_config) if getattr(args, 'upstream_config', None) else {}
         if not isinstance(overrides, dict):
             raise ValueError('--upstream-config must be a JSON object')
@@ -310,20 +326,51 @@ def main(argv=None):
 
         import torch
         from .training import FineTuner, initialize_delta, predict, run_training, save_checkpoint, seed_step
+        if args.command == 'embed':
+            from .embeddings import extract_embeddings
+            validate_rows(rows, require_splits=True)
+            if not 0 <= args.shard_index < args.shard_count:
+                raise ValueError('Require 0 <= shard-index < shard-count')
+            if Path(args.output).exists():
+                raise FileExistsError(f'Refusing to overwrite embeddings: {args.output}')
+            preparation = verify_features(args.features, [r for r in rows if predictable(r)])
+            check_preparation(preparation, args.model_name, overrides, provenance)
+            identity = {'source': provenance, 'model_name': args.model_name, 'upstream_overrides': overrides,
+                        'base_checkpoint_sha256': file_hash(args.base_checkpoint)}
+            backend = native_backend(build_config(args.model_name, overrides), args.base_checkpoint)
+            extract_embeddings(backend, rows, args.features, args.output, identity, torch.device(args.device),
+                               args.precision, args.shard_index, args.shard_count)
+            print(f'Embeddings written to {args.output}'); return 0
         if args.command == 'train':
             check_train_args(args)
             validate_rows(rows, require_splits=True)
             train, validation = training_rows(rows)
-            preparation = verify_features(args.features, train + validation, structure=args.mode == 'joint',
-                                          synthetic=args.negative_mode == 'synthetic')
-            check_preparation(preparation, args.model_name, overrides, provenance)
-            base_hash = file_hash(args.base_checkpoint)
+            embeddings = None
+            if cached:
+                from .embeddings import CachedBackend, DiskEmbeddings
+                embeddings = DiskEmbeddings(args.embeddings, train + validation, args.features)
+                identity = embeddings.identity
+                if args.upstream_config and overrides != identity['upstream_overrides']:
+                    raise ValueError('Embedding upstream configuration differs')
+                if args.model_name != identity['model_name']:
+                    raise ValueError('Embedding model_name differs')
+                provenance, overrides = identity['source'], identity['upstream_overrides']
+                base_hash = identity['base_checkpoint_sha256']
+                if args.base_checkpoint and file_hash(args.base_checkpoint) != base_hash:
+                    raise ValueError('Embedding base checkpoint differs')
+            else:
+                preparation = verify_features(args.features, train + validation, structure=args.mode == 'joint',
+                                              synthetic=args.negative_mode == 'synthetic')
+                check_preparation(preparation, args.model_name, overrides, provenance)
+                base_hash = file_hash(args.base_checkpoint)
             initial = initial_hash = None
             if args.init_checkpoint:
                 initial = torch.load(args.init_checkpoint, map_location='cpu', weights_only=True)
                 previous = initial['metadata']
                 if previous['base_checkpoint_sha256'] != base_hash or previous['model_name'] != args.model_name or previous['upstream_overrides'] != overrides:
                     raise ValueError('Initialization must use the same base checkpoint, native model and upstream config')
+                if cached and previous.get('embedding_identity', identity) != identity:
+                    raise ValueError('Initialization embedding identity differs')
                 initial_hash = file_hash(args.init_checkpoint)
             elif args.resume:
                 resumed = torch.load(args.resume, map_location='cpu', weights_only=True)
@@ -339,12 +386,18 @@ def main(argv=None):
                 'base_checkpoint_sha256': base_hash, 'task_names': tasks,
                 'init_checkpoint_sha256': initial_hash,
                 'manifest_sha256': file_hash(args.manifest),
-                'preparation_sha256': file_hash(Path(args.features) / 'preparation.json'),
+                'preparation_sha256': file_hash(Path(args.features) / 'preparation.json') if not cached else None,
                 'world_size': int(os.environ.get('WORLD_SIZE', '1')), 'seed_scheme': 2}
-            config = build_config(args.model_name, overrides)
             seed_step(args.seed)
-            model = FineTuner(native_backend(config, args.base_checkpoint), mode=args.mode,
-                              trainable_prefixes=args.trainable_prefix, hidden=args.hidden, task_names=tasks)
+            if cached:
+                metadata.update(embedding_identity=embeddings.identity, embedding_shards=sorted(embeddings.receipts),
+                                embedding_features={key: entry['feature_sha256']
+                                                    for key, (_, entry) in embeddings.entries.items()})
+                backend = CachedBackend(embeddings.identity)
+            else:
+                backend = native_backend(build_config(args.model_name, overrides), args.base_checkpoint)
+            model = FineTuner(backend, mode=args.mode, trainable_prefixes=args.trainable_prefix,
+                              hidden=args.hidden, task_names=tasks, embeddings=embeddings)
             if initial:
                 initialize_delta(model, initial)
             run_training(model, rows, args.features, args, metadata)
@@ -353,7 +406,8 @@ def main(argv=None):
         # predict/export: every check runs before the base checkpoint is loaded or inference starts.
         payload = torch.load(args.checkpoint, map_location='cpu', weights_only=True)
         metadata = payload['metadata']
-        warn_commit('Checkpoint', metadata.get('source'), provenance)
+        if not cached:
+            warn_commit('Checkpoint', metadata.get('source'), provenance)
         if Path(args.output).exists():
             raise FileExistsError(f'Refusing to overwrite: {args.output}')
         if args.command == 'export':
@@ -374,9 +428,27 @@ def main(argv=None):
             raise ValueError(f'No rows of trained tasks selected for prediction; untrained: {untrained}')
         if untrained:
             print(f'warning: skipping rows of tasks this checkpoint never trained: {untrained}', file=sys.stderr)
-        preparation = verify_features(args.features, selected)
-        check_preparation(preparation, metadata['model_name'], metadata.get('upstream_overrides'), provenance)
-        model = restore(args, payload)
+        if cached:
+            from .embeddings import CachedBackend, DiskEmbeddings
+            from .training import load_delta
+            if metadata['mode'] != 'head':
+                raise ValueError('Disk embeddings cannot predict a joint checkpoint')
+            embeddings = DiskEmbeddings(args.embeddings, selected, args.features, metadata.get('embedding_identity'))
+            for key, digest in metadata.get('embedding_features', {}).items():
+                if key in embeddings and embeddings.entries[key][1]['feature_sha256'] != digest:
+                    raise ValueError('Stale embedding: feature provenance differs from checkpoint')
+            for key in ('base_checkpoint_sha256', 'model_name', 'upstream_overrides'):
+                if embeddings.identity[key] != metadata[key]:
+                    raise ValueError(f'Embedding {key} differs from checkpoint')
+            if args.base_checkpoint and file_hash(args.base_checkpoint) != metadata['base_checkpoint_sha256']:
+                raise ValueError('Embedding base checkpoint differs')
+            model = FineTuner(CachedBackend(embeddings.identity), hidden=metadata['hidden'],
+                              task_names=metadata.get('task_names', ['xray:hit']), embeddings=embeddings)
+            load_delta(model, payload)
+        else:
+            preparation = verify_features(args.features, selected)
+            check_preparation(preparation, metadata['model_name'], metadata.get('upstream_overrides'), provenance)
+            model = restore(args, payload)
         device = torch.device(args.device)
         model.to(device)
         predictions = predict(model, selected, args.features, device, args.precision)
@@ -387,7 +459,8 @@ def main(argv=None):
                                 'training': metadata,
                                 'checkpoint_sha256': file_hash(args.checkpoint),
                                 'manifest_sha256': file_hash(args.manifest),
-                                'preparation_sha256': file_hash(Path(args.features) / 'preparation.json'),
+                                'preparation_sha256': file_hash(Path(args.features) / 'preparation.json') if not cached else None,
+                                'embedding_shards': sorted(embeddings.receipts) if cached else None,
                                 'score_meaning': 'Task/endpoint-specific screening score; not Kd or an assay-independent binding probability'})
         return 0
     except (ValueError, RuntimeError, OSError, ImportError, KeyError, csv.Error, http.client.HTTPException) as error:

@@ -109,6 +109,41 @@ python -m fragment_ft train data/manifest.split.csv \
 - `--precision` 기본값은 train/predict 모두 `bf16`이지만 CUDA에서만 적용되며 CPU는 fp32입니다(metadata의 `effective_precision`). Binding head와 logit은 bf16에서도 fp32로 계산합니다. BF16 수치 동작은 미검증이므로 첫 native smoke는 `--precision fp32`로 실행하세요.
 - 기존 `--output`(resume 제외), head mode의 `--trainable-prefix`, prefix 없는 joint mode는 feature hash 계산과 기반 checkpoint 로딩 전에 거부합니다. `--steps`, `--eval-every`, `--accumulate`, `--hidden`, `--top-k`, `--dist-timeout-minutes`는 양의 정수여야 합니다.
 
+### Disk embeddings: GPU 추출과 CPU head 학습 분리
+
+고정 backbone 실험은 `embed`로 pooled CPU float32 vector를 디스크에 저장한 뒤 재사용할 수 있습니다. Pooling은 기존 protein/ligand single 평균과 양방향 interface pair 평균 그대로입니다. Label/split에 독립적인 `binding_key`를 정렬하고 중복 관측을 합쳐 각 key를 한 번만 encode합니다. 기존 입력별 RNG 격리를 사용하며 native backend는 eval/frozen 상태입니다.
+
+```bash
+# 별도 프로세스/GPU에서 실행. shard-index는 0부터 시작합니다.
+CUDA_VISIBLE_DEVICES=0 python3 -m fragment_ft embed data/manifest.split.csv \
+  --features prepared/all --base-checkpoint /data/protenix/checkpoint/protenix_base_default_v1.0.0.pt \
+  --protenix-source /opt/Protenix --output prepared/embeddings-0 \
+  --device cuda --precision fp32 --shard-index 0 --shard-count 2
+CUDA_VISIBLE_DEVICES=1 python3 -m fragment_ft embed data/manifest.split.csv \
+  --features prepared/all --base-checkpoint /data/protenix/checkpoint/protenix_base_default_v1.0.0.pt \
+  --protenix-source /opt/Protenix --output prepared/embeddings-1 \
+  --device cuda --precision fp32 --shard-index 1 --shard-count 2
+
+python3 -m fragment_ft train data/manifest.split.csv \
+  --embeddings prepared/embeddings-0 prepared/embeddings-1 \
+  --mode head --device cpu --precision fp32 --output runs/cached-head \
+  --steps 1000 --eval-every 50
+python3 -m fragment_ft predict data/manifest.split.csv \
+  --embeddings prepared/embeddings-0 prepared/embeddings-1 \
+  --checkpoint runs/cached-head/step_001000.pt --device cpu --precision fp32 \
+  --split test --output runs/cached-head/test.json
+```
+
+각 shard는 같은 manifest·prepared directory·checkpoint·config·precision으로 추출합니다. 단일 GPU는 shard 옵션을 생략합니다. `torchrun` 자동 분산 추출이 아니라 명시적 key 분할이며 프로세스별 GPU 선택은 실행자가 지정합니다. `--model-name protenix-v2`나 `--upstream-config`를 추출에 사용했다면 해당 model-name을 cached train에도 전달하세요. Cached train은 config를 artifact에서 읽으며 명시한 config가 다르면 거부합니다.
+
+`embeddings.json`에는 기반 checkpoint SHA256, 모델명, upstream overrides/source provenance, pooling/seed 버전, 실제 추출 precision, 차원, 전체 key 목록과 shard index/count, preparation 기록 및 SHA256, key별 feature/vector SHA256과 metadata integrity가 있습니다. 각 `<binding_key>.pt`는 CPU vector 하나입니다. 기존 출력은 덮어쓰지 않습니다. 중단된 추출은 완성된 metadata가 없어 사용할 수 없으므로 다른 출력 경로로 다시 실행합니다.
+
+Cached train/predict는 로딩할 때 필요한 key coverage, shard 호환성, vector hash·shape·dtype·finite 값을 검사하고 pooled CPU vector를 RAM에 유지합니다. Forward마다 디스크 로딩/hash를 반복하지 않습니다. 실행 중 shard는 불변이어야 하며 RAM 사용량은 제공한 vector 수에 비례하므로 대규모 corpus에서는 측정하세요. 중복 shard/key는 거부합니다. 선택한 행을 모두 포함하면 전체 shard가 없어도 predict할 수 있습니다. Optional `--features prepared/all`을 전달하면 현재 packet hash까지 비교하여 stale embedding을 거부합니다. Feature directory 없이 실행하면 기록된 provenance와 artifact integrity만 검사하며 원본 입력의 외부 변경은 알 수 없습니다. Hash는 우발적 변경 검출용이지 서명이 아닙니다.
+
+CPU cached head 경로는 Protenix import, 원본 checkpoint, prepared tensor가 필요 없습니다(PyTorch는 필요). `--base-checkpoint`를 선택적으로 전달하면 hash도 대조합니다. Joint/synthetic 학습 및 joint checkpoint의 cached 예측은 거부합니다. Resume은 기존 metadata 동등성 규칙에 더해 동일 shard receipt를 요구하며 경로 이동은 허용합니다. Init은 기존 task별 head 전달 규칙을 유지하고 backbone delta를 cached head로 옮기지 않습니다. 기존 native 경로도 유지됩니다.
+
+검증 범위는 tiny CPU mock backend의 key별 1회 encode, fresh model disk 재사용, shard/손상/누락/stale 거부, native 없이 CLI head train/predict 및 resume/init입니다. 실제 Protenix/CUDA 추출, GPU 간 수치 재현성, BF16 정확도와 속도·메모리 개선은 측정하지 않았습니다. 추출 시간과 CPU 학습 시간을 따로 측정하세요. 이 경로는 학습 loop나 sampling/batching 정책을 바꾸지 않습니다.
+
 본체 일부도 fine-tuning하는 기본 비교군:
 
 ```bash
